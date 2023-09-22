@@ -1,3 +1,5 @@
 hw1/problem5/__pycache__/*
 hw1/problem5/data/
 .DS_Store
+hw1/data/
+hw1/saved_models/
