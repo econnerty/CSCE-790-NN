@@ -1,41 +1,41 @@
 import numpy as np
+from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 
-np.random.seed(0)  # for reproducibility
-n_hidden = 10
-learning_rate = 0.1
-epochs = 1000
-
-# Randomly initialize weights and biases
-W1 = np.random.randn(1, n_hidden)
-b1 = np.random.randn(n_hidden)
-W2 = np.random.randn(n_hidden, 1)
-b2 = np.random.randn(1)
-
+# Define the sigmoid function σ(x)
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    return 1 / (1 + np.exp(-100 * x))
 
-def sigmoid_derivative(x):
-    return x * (1 - x)
+# Define the right-hand side of the differential equation system
+def hopfield(t, x, W, b):
+    sigma_x = sigmoid(x)
+    dxdt = -21 * x + 12 * np.dot(W.T, sigma_x) + 12 * b
+    return dxdt
+
+# Define W and b
+W = np.array([[0, 1], [1, 0]])
+b = np.array([0, 0])
+
+# Create a grid of initial conditions
+x_init_vals = np.linspace(-1, 1, 10)
+y_init_vals = np.linspace(-1, 1, 10)
+initial_conditions = [(x_init, y_init) for x_init in x_init_vals for y_init in y_init_vals]
 
 
-def forward_propagation(X):
-    z1 = np.dot(X, W1) + b1
-    a1 = sigmoid(z1)
-    z2 = np.dot(a1, W2) + b2
-    return a1, z2
+# Create a figure for the phase-plane plot
+plt.figure()
 
+for init_cond in initial_conditions:
+    # Solve the differential equation system for this initial condition
+    sol = solve_ivp(hopfield, [0, 10], init_cond, args=(W, b), t_eval=np.linspace(0, 10, 1000))
+    # Plot the trajectory for this initial condition
+    plt.plot(sol.y[0], sol.y[1])
 
-def backward_propagation(X, Y, a1, z2):
-    global W1, b1, W2, b2
-    error = z2 - Y
-    dW2 = np.dot(a1.T, error)
-    db2 = np.sum(error)
-    d_z1 = np.dot(error, W2.T) * sigmoid_derivative(a1)
-    dW1 = np.dot(X.T, d_z1)
-    db1 = np.sum(d_z1, axis=0)
-    W1 -= learning_rate * dW1
-    b1 -= learning_rate * db1
-    W2 -= learning_rate * dW2
-    b2 -= learning_rate * db2
-    return np.mean(np.abs(error))
+# Configure the plot
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Phase-Plane Trajectories')
+plt.grid(True)
+plt.xlim([-1, 1])
+plt.ylim([-1, 1])
+plt.savefig('phase_plane_trajectories.pdf')
