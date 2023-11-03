@@ -1,6 +1,6 @@
 import numpy as np
 
-np.random.seed(10)  # for reproducibility
+np.random.seed(5)  # for reproducibility
 input_dim = 2
 output_dim = 2
 learning_rate = 0.001
@@ -56,37 +56,41 @@ plt.savefig('training_error_vs_epoch_number.pdf')
 def plot_decision_boundary(epoch):
     plt.figure(figsize=(8, 6))
 
-    # Generate a grid of points in the input space
-    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    h = 0.01  # step size in the mesh
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                         np.arange(y_min, y_max, h))
+    # Extracting weights and biases
+    w1, w2 = weights[0], weights[1]
+    b1, b2 = biases[0], biases[1]
 
-    # Flatten the grid to pass into the network, then reshape the output to match the grid
-    Z = forward_propagation(np.c_[xx.ravel(), yy.ravel()])
-    # Convert sigmoid outputs to binary (0 or 1) based on a 0.5 threshold
-    Z_bin = (Z > 0.5).astype(int)
-    # Combine the binary outputs of the two neurons to form a class label (0, 1, 2, or 3)
-    Z_class = Z_bin[:, 0] * 2 + Z_bin[:, 1]
-    Z_class = Z_class.reshape(xx.shape)
+    # Calculating the slope and intercept for the two decision boundaries
+    m1 = -w1[0] / w1[1]
+    c1 = -b1 / w1[1]
+    m2 = -w2[0] / w2[1]
+    c2 = -b2 / w2[1]
 
-    # Plot the contour
-    plt.contourf(xx, yy, Z_class, alpha=0.8)
-    # Plot the data points
-    # Convert target matrix Y to class labels
+    # Generating the x-coordinates for the decision boundary lines
+    x_coords = np.linspace(X[:, 0].min() - 1, X[:, 0].max() + 1, 400)
+
+    # Generating the y-coordinates for the decision boundary lines
+    y_coords1 = m1 * x_coords + c1
+    y_coords2 = m2 * x_coords + c2
+
+    # Plotting the decision boundary lines
+    plt.plot(x_coords, y_coords1, label='Decision Boundary 1')
+    plt.plot(x_coords, y_coords2, label='Decision Boundary 2')
+
+    # Plotting the data points
     Y_class = np.argmax(Y, axis=1) * 2 + np.argmin(Y, axis=1)
     plt.scatter(X[:, 0], X[:, 1], c=Y_class, edgecolors='k', marker='o', linewidth=1)
 
-    plt.scatter(X[:, 0], X[:, 1], c=Y_class, edgecolors='k', marker='o', linewidth=1, label='_nolegend_')  # Hide legend entry for data points
-    handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=plt.cm.jet(i/3), markersize=10, label=f'Class {i}') for i in range(4)]
-    plt.legend(handles=handles, title='Classes')
-
+    plt.legend()
     plt.title(f'Decision Boundary and Data Points after {epoch} Epochs')
     plt.savefig(f'decision_boundary_and_data_points_after_{epoch}_epochs.pdf')
 
+# Call the function after training
+plot_decision_boundary(epochs)
+
+
 # Reset weights and biases
-np.random.seed(10)
+np.random.seed(5)
 weights = np.random.randn(input_dim, output_dim)
 biases = np.random.randn(output_dim)
 
