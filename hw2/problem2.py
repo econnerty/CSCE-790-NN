@@ -1,12 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.random.seed(1)  # for reproducibility
-n_hidden = 500
-learning_rate = 0.001
-epochs = 1000
+np.random.seed(15)  # for reproducibility
+n_hidden = 100
+learning_rate = 0.01
+epochs = 10000
 
 # Randomly initialize weights and biases
+#he initialization
 W1 = np.random.randn(1, n_hidden)
 W2 = np.random.randn(n_hidden, 1)
 b1 = np.random.randn(n_hidden)
@@ -17,6 +18,12 @@ def relu(x):
 
 def relu_derivative(x):
     return np.where(x > 0, 1, 0)
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def sigmoid_derivative(x):
+    return x * (1 - x)
 
 def mse_loss(y_true, y_pred):
     return np.mean((y_true - y_pred) ** 2)
@@ -48,22 +55,36 @@ Y = np.array([[-0.96], [-0.577], [-0.073], [0.377], [0.641], [0.66], [0.461], [0
               [-0.201], [-0.434], [-0.5], [-0.393], [-0.165], [0.099], [0.307], [0.396],
               [0.345], [0.182], [-0.031], [-0.219], [-0.321]])
 
+#sample points in the range [-1,1]
+X2 = np.random.uniform(-1,1,(1000,1))
+
 errors = []
 
 def plot_approximation(epoch):
-    a1, z2,z1 = forward_propagation(X)
+    # Forward propagate through the network
+    a1, z2, z1 = forward_propagation(X2)
+    
+    # Sort the X2 and z2 arrays by the X2 values for proper plotting
+    sorted_indices = np.argsort(X2[:, 0])
+    sorted_X2 = X2[sorted_indices]
+    sorted_z2 = z2[sorted_indices]
+    
     plt.figure()
-    plt.plot(X, Y, label='Actual function')
-    plt.plot(X, z2, label='NN approximation')
+    plt.plot(X, Y, 'r-', label='Actual function')  # Plot as a red line
+    plt.plot(sorted_X2, sorted_z2, 'b-', label='NN approximation')  # Plot as a blue line
     plt.legend()
     plt.title(f'Function Approximation after {epoch} Epochs')
+    plt.xlabel('X value')
+    plt.ylabel('Predicted Y value')
     plt.savefig(f'function_approximation_{epoch}_epochs.pdf')
+
+
 
 for epoch in range(epochs):
     a1, z2,z1 = forward_propagation(X)
     error = backward_propagation(X, Y, a1, z2,z1)
     errors.append(error)
-    if epoch+1 in [10,100,200,400,1000]:
+    if epoch+1 in [10,100,200,400,1000,10000]:
         plot_approximation(epoch+1)
 
 # (1) Training error vs epoch number
