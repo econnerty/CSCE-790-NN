@@ -148,3 +148,45 @@ for epoch in range(900):
     error = backward_propagation(X, Y, output)
 plot_decision_boundary(1000)
 
+def plot_final_decision_boundary(ylim=(-10, 10), colors=None):
+    #clear previous plot
+    plt.clf()
+    plt.figure(figsize=(8, 6))
+
+    # Extracting weights and biases (assuming these are accessible in the function's scope)
+    w1, w2 = weights[0], weights[1]
+    b1, b2 = biases[0], biases[1]
+
+    # Calculating the slope and intercept for the two decision boundaries
+    m1 = -w1[0] / w1[1]
+    c1 = -b1 / w1[1]
+    m2 = -w2[0] / w2[1]
+    c2 = -b2 / w2[1]
+
+    # Generating the x-coordinates for the decision boundary lines
+    x_coords = np.linspace(X[:, 0].min() - 1, X[:, 0].max() + 1, 400)
+
+    # Generating the y-coordinates for the decision boundary lines
+    y_coords1 = m1 * x_coords + c1
+    y_coords2 = m2 * x_coords + c2
+
+    # Plotting the decision boundary lines
+    plt.plot(x_coords, y_coords1, label='Decision Boundary 1')
+    plt.plot(x_coords, y_coords2, label='Decision Boundary 2')
+
+    # Plotting the data points
+    #Y_class = np.argmax(Y, axis=1) * 2 + np.argmin(Y, axis=1)
+    
+    # If colors are not provided, use a default colormap
+    #if colors is None:
+    #    colors = plt.cm.coolwarm(Y_class / float(max(Y_class)))
+
+    #plt.scatter(X[:, 0], X[:, 1], c=colors, edgecolors='k', marker='o', linewidth=1)
+
+    plt.ylim(ylim)  # Set the vertical range
+
+    plt.legend()
+    plt.title(f'Final Decision Boundaries')
+    plt.savefig(f'final decision boundary.pdf')
+plot_final_decision_boundary()
+

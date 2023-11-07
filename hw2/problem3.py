@@ -1,41 +1,43 @@
 import numpy as np
-from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
 
-# Define the sigmoid function σ(x)
+# Define the sigmoid function
 def sigmoid(x):
-    return 1 / (1 + np.exp(-100 * x))
+    return (1 - np.exp(-100*x)) / (1 + np.exp(-100*x))
 
-# Define the right-hand side of the differential equation system
-def hopfield(t, x, W, b):
-    sigma_x = sigmoid(x)
-    dxdt = -21 * x + 12 * np.dot(W.T, sigma_x) + 12 * b
-    return dxdt
+# Define the system of differential equations
+def hopfield_network(t, x, W, b):
+    return -0.5 * x + 0.5 * W.T @ sigmoid(x) + 0.5 * b
 
-# Define W and b
+# Define the weight matrix W and bias vector b as given
 W = np.array([[0, 1], [1, 0]])
 b = np.array([0, 0])
 
 # Create a grid of initial conditions
-x_init_vals = np.linspace(-1, 1, 10)
-y_init_vals = np.linspace(-1, 1, 10)
-initial_conditions = [(x_init, y_init) for x_init in x_init_vals for y_init in y_init_vals]
+grid_values = np.linspace(-1, 1, 20)
+initial_conditions = np.array(np.meshgrid(grid_values, grid_values)).T.reshape(-1, 2)
 
+# Time span for the simulation
+t_span = [0, 10]
 
-# Create a figure for the phase-plane plot
-plt.figure()
+# Solve the system for each initial condition and plot the phase-plane trajectories
+plt.figure(figsize=(8, 8))
 
-for init_cond in initial_conditions:
-    # Solve the differential equation system for this initial condition
-    sol = solve_ivp(hopfield, [0, 10], init_cond, args=(W, b), t_eval=np.linspace(0, 10, 1000))
-    # Plot the trajectory for this initial condition
-    plt.plot(sol.y[0], sol.y[1])
+for x0 in initial_conditions:
+    # Solve the differential equation
+    sol = solve_ivp(hopfield_network, t_span, x0, args=(W, b), dense_output=True)
+    
+    # Plot the trajectory
+    t_values = np.linspace(t_span[0], t_span[1], 300)
+    x_values = sol.sol(t_values)
+    plt.plot(x_values[0], x_values[1], linewidth=1)
 
-# Configure the plot
-plt.xlabel('x')
-plt.ylabel('y')
-plt.title('Phase-Plane Trajectories')
+# Plot settings
+plt.title('Phase-plane trajectories of the Hopfield Network')
+plt.xlabel('x1')
+plt.ylabel('x2')
 plt.grid(True)
-plt.xlim([-1, 1])
-plt.ylim([-1, 1])
-plt.savefig('phase_plane_trajectories.pdf')
+plt.xlim(-1, 1)
+plt.ylim(-1, 1)
+plt.savefig('phase_plane_trajectories2.pdf')
