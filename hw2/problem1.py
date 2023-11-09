@@ -146,8 +146,6 @@ def plot_decision_boundary(epoch, ylim=(-5, 5), colors=None):
     plt.title(f'Decision Boundary and Data Points after {epoch} Epochs')
     plt.savefig(f'decision_boundary_and_data_points_after_{epoch}_epochs.pdf')
 
-# Assuming X, Y, weights, and biases are defined elsewhere in the code
-
 
 # Call the function after training
 #plot_decision_boundary(epochs)
