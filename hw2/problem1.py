@@ -101,7 +101,7 @@ def convert_to_class(y):
 def plot_decision_boundary(epoch, ylim=(-5, 5), colors=None):
     plt.figure(figsize=(8, 6))
 
-    # Extracting weights and biases (assuming these are accessible in the function's scope)
+    # Extracting weights and biases
     w1, w2 = weights[:,0], weights[:,1]
     b1, b2 = biases[0], biases[1]
 
