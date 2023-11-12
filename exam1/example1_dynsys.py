@@ -69,11 +69,11 @@ losses = np.array(train_network(nn, X, Y, epochs=100, learning_rate=0.005))
 print(losses[-1])
 #Plot the loss over time
 import matplotlib.pyplot as plt
-plt.plot(losses.flatten())
+"""plt.plot(losses.flatten())
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.title('Loss over time')
-plt.show()
+plt.show()"""
 
 
 
@@ -109,8 +109,87 @@ for k in range(2, len(yp_test)-1):
 import matplotlib.pyplot as plt
 plt.plot(predicted, label='predicted')
 plt.plot(actual, label='actual')
+plt.title('Predicted vs actual Plant Output')
 plt.legend()
 plt.show()
+
+# Generate sum of sinusoidal data
+
+
+
+
+# Generate data
+num_data_points = 5000
+yp = np.zeros(num_data_points)
+
+u = np.sin(2 * np.pi * np.arange(num_data_points) / 250) + np.sin(2 * np.pi * np.arange(num_data_points) / 25)
+
+for k in range(2, num_data_points):
+    yp[k] = plant_equation(yp[k-1], yp[k-2], u[k-1])
+
+def train_network(nn, X, Y, epochs=50, learning_rate=0.001):
+    losses = []
+    for epoch in tqdm(range(epochs)):
+        loss = 0
+        for i in range(len(X)-1):
+            o = nn.forward(X[i:i+1])  # Use slicing to keep dimensions
+            loss +=nn.backward(X[i:i+1], Y[i], o, learning_rate)
+        mean_loss = loss / (len(X)-1)
+        losses.append(mean_loss)
+    return losses
+# Prepare the data for training
+X = np.array([yp[:-1], yp[1:], u[:-1]]).T
+Y = yp[2:].reshape(-1, 1)
+
+# Initialize and train the network
+nn = SimpleNN(input_size=3, hidden_size=10, output_size=1)
+losses = np.array(train_network(nn, X, Y, epochs=1000, learning_rate=0.005))
+print(losses[-1])
+#Plot the loss over time
+import matplotlib.pyplot as plt
+"""plt.plot(losses.flatten())
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Loss over time')
+plt.show()"""
+
+
+
+# Test the network
+predicted = []
+actual = []
+
+
+# Generate sinusoidal test data
+test_data = np.sin(2 * np.pi * np.arange(1000) / 250) + np.sin(2 * np.pi * np.arange(1000) / 25)
+yp_test = np.zeros(len(test_data) + 2)  # Include initial conditions
+
+# The test should start where the plant has some initial dynamic behavior
+yp_test[0] = yp[-2]  # Second last value from the training data
+yp_test[1] = yp[-1]  # Last value from the training data
+
+# Run the test predictions
+for k in range(2, len(yp_test)-1):
+    # Create the input vector for the neural network
+    input_vec = np.array([[yp_test[k-1], yp_test[k-2], test_data[k-1]]])
+    # Predict the next output
+    prediction = nn.forward(input_vec)
+    # Update the plant using the actual equation for the next time step
+    yp_test[k] = plant_equation(yp_test[k-1], yp_test[k-2], test_data[k-1])
+    # Append to the lists
+    predicted.append(prediction[0][0])  # Adjust if the output structure is different
+    actual.append(yp_test[k])
+
+
+
+# Compare the predicted and actual values
+import matplotlib.pyplot as plt
+plt.plot(predicted, label='predicted')
+plt.plot(actual, label='actual')
+plt.title('Predicted vs actual Plant Output with Sum of Sinusoids')
+plt.legend()
+plt.show()
+
 
 
 
