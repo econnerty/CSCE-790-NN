@@ -2,7 +2,7 @@ import numpy as np
 from tqdm.auto import tqdm
 
 def f(u):
-    return 0.6 * np.sin(u) + 0.3 * np.sin(3 * u) + 0.1 * np.sin(5 * u)
+    return 0.6 * np.sin(np.pi * u) + 0.3 * np.sin(3 * np.pi * u) + 0.1 * np.sin(5 * np.pi * u)
 
 def plant_equation(yp_k, yp_k_minus_1, u_k):
     return 0.3 * yp_k + 0.6 * yp_k_minus_1 + f(u_k)
@@ -65,7 +65,7 @@ Y = yp[2:].reshape(-1, 1)
 
 # Initialize and train the network
 nn = SimpleNN(input_size=3, hidden_size=10, output_size=1)
-losses = np.array(train_network(nn, X, Y))
+losses = np.array(train_network(nn, X, Y, epochs=100, learning_rate=0.005))
 print(losses[-1])
 #Plot the loss over time
 import matplotlib.pyplot as plt
@@ -78,17 +78,32 @@ plt.show()
 
 
 # Test the network
-test_data = np.random.uniform(-1, 1, 100)
 predicted = []
 actual = []
 
+
+
+# Generate sinusoidal test data
+test_data = np.sin(2 * np.pi * np.arange(1000) / 250)
 yp_test = np.zeros(len(test_data) + 2)  # Include initial conditions
 
-for k in range(2, len(test_data) + 2):
-    yp_test[k] = plant_equation(yp_test[k-1], yp_test[k-2], test_data[k-2])
-    prediction = nn.forward(np.array([yp_test[k-1], yp_test[k-2], test_data[k-2]]))
-    predicted.append(prediction)
+# The test should start where the plant has some initial dynamic behavior
+yp_test[0] = yp[-2]  # Second last value from the training data
+yp_test[1] = yp[-1]  # Last value from the training data
+
+# Run the test predictions
+for k in range(2, len(yp_test)-1):
+    # Create the input vector for the neural network
+    input_vec = np.array([[yp_test[k-1], yp_test[k-2], test_data[k-1]]])
+    # Predict the next output
+    prediction = nn.forward(input_vec)
+    # Update the plant using the actual equation for the next time step
+    yp_test[k] = plant_equation(yp_test[k-1], yp_test[k-2], test_data[k-1])
+    # Append to the lists
+    predicted.append(prediction[0][0])  # Adjust if the output structure is different
     actual.append(yp_test[k])
+
+
 
 # Compare the predicted and actual values
 import matplotlib.pyplot as plt
