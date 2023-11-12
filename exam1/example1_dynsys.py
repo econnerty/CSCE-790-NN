@@ -1,6 +1,8 @@
 import numpy as np
 from tqdm.auto import tqdm
 
+np.random.seed(42)  # for reproducibility
+
 def f(u):
     return 0.6 * np.sin(np.pi * u) + 0.3 * np.sin(3 * np.pi * u) + 0.1 * np.sin(5 * np.pi * u)
 

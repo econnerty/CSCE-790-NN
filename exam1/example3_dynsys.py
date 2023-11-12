@@ -18,7 +18,7 @@ def plant_equation(yp_k, u_k):
 
 # Generate random input data for u(k) in the interval [-2, 2]
 num_data_points = 5000
-u = np.sin(2 * np.pi * np.arange(num_data_points) / 250) + np.sin(2 * np.pi * np.arange(num_data_points) / 10)
+u = np.sin(2 * np.pi * np.arange(num_data_points) / 25) + np.sin(2 * np.pi * np.arange(num_data_points) / 10)
 
 # Initialize the output array for y_p(k)
 yp = np.zeros(num_data_points)
