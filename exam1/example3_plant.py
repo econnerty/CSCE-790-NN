@@ -73,8 +73,8 @@ X = np.array([yp[:-1], yp[1:], u[:-1]]).T
 Y = yp[2:].reshape(-1, 1)
 
 # Initialize and train the network
-nn_f = SimpleNN(input_size=1, hidden_size=10, output_size=1)
-nn_g = SimpleNN(input_size=1, hidden_size=10, output_size=1)
+nn_f = SimpleNN(input_size=1, hidden_size=15, output_size=1)
+nn_g = SimpleNN(input_size=1, hidden_size=15, output_size=1)
 
 # Prepare the data for training N_f
 X_f = yp[:-1].reshape(-1, 1)
@@ -85,8 +85,8 @@ X_g = u[:-1].reshape(-1, 1)
 Y_g = np.array([g_plant(u_val) for u_val in u[:-1]]).reshape(-1, 1)
 
 # Train both networks
-losses_f = np.array(train_network(nn_f, X_f, Y_f, epochs=10, learning_rate=0.1))
-losses_g = np.array(train_network(nn_g, X_g, Y_g, epochs=10, learning_rate=0.1))
+losses_f = np.array(train_network(nn_f, X_f, Y_f, epochs=100, learning_rate=0.01))
+losses_g = np.array(train_network(nn_g, X_g, Y_g, epochs=100, learning_rate=0.01))
 print(losses_f[-1])
 print(losses_g[-1])
 
@@ -98,12 +98,55 @@ plt.show()"""
 
 
 # Generate new test data for u(k)
-test_data_u = np.random.uniform(-2, 2, 50)
+test_data_u = np.random.uniform(-10, 10, 500)
+test_data_u.sort()
+
+# Generate the test outputs for N_f and N_g
+test_output_f = np.array([nn_f.forward(np.array([[y]])) for y in test_data_u]).flatten()
+
+# Calculate the actual values using the plant functions
+actual_f = f_plant(test_data_u)
+
+# Plot the test outputs and actual values for comparison
+
+plt.plot(test_data_u,actual_f, label='Actual Nf')
+plt.plot(test_data_u,test_output_f, label='Predicted Nf')
+plt.xlim(-10,10)
+plt.legend()
+plt.title('Predicted Outputs for Nf')
+plt.savefig('ex3_nf_predictedvs_actual.pdf')
+plt.close()
+
+# Generate new test data for u(k)
+test_data_u = np.random.uniform(-2, 2, 500)
+test_data_u.sort()
+
+# Generate the test outputs for N_f and N_g
+test_output_g = np.array([nn_g.forward(np.array([[u]])) for u in test_data_u]).flatten()
+
+# Calculate the actual values using the plant functions
+actual_g = g_plant(test_data_u)
+
+# Plot the test outputs and actual values for comparison
+
+plt.plot(test_data_u,actual_g,label='Actual Ng')
+plt.plot(test_data_u,test_output_g, label='Predicted Ng')
+plt.xlim(-2,2)
+plt.legend()
+plt.title('Predicted Outputs for Ng')
+plt.savefig('ex3_ng_predictedvs_actual.pdf')
+plt.close()
+
+
+
+# Generate new test data for u(k) with sinusoidal input
+test_data_u = np.sin(2 * np.pi * np.arange(500) / 25) + np.sin(2 * np.pi * np.arange(500) / 10)
 
 # Generate the test outputs for N_f and N_g
 test_output_f = np.array([nn_f.forward(np.array([[y]])) for y in test_data_u]).flatten()
 test_output_g = np.array([nn_g.forward(np.array([[u]])) for u in test_data_u]).flatten()
 predicted_plant = test_output_f + test_output_g
+
 
 # Calculate the actual values using the plant functions
 actual_f = f_plant(test_data_u)
@@ -112,27 +155,12 @@ actual_plant = actual_f + actual_g
 
 # Plot the test outputs and actual values for comparison
 
-plt.plot(actual_f, label='Actual Nf')
-plt.plot(test_output_f, label='Predicted Nf')
-plt.legend()
-plt.title('Predicted Outputs for Nf')
-plt.savefig('ex3_nf_predictedvs_actual.pdf')
-plt.close()
-
-plt.plot(actual_g,label='Actual Ng')
-plt.plot(test_output_g, label='Predicted Ng')
-plt.legend()
-plt.title('Predicted Outputs for Ng')
-plt.savefig('ex3_ng_predictedvs_actual.pdf')
-plt.close()
-
 plt.plot(actual_plant, label='Actual Plant')
 plt.plot(predicted_plant, label='Predicted plant')
 plt.legend()
 plt.title('Predicted Outputs and Actual plant Values')
 plt.savefig('ex3_predictedvs_actual.pdf')
 plt.close()
-
 
 
 

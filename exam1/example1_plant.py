@@ -12,7 +12,7 @@ def plant_equation(yp_k, yp_k_minus_1, u_k):
 # Generate data
 num_data_points = 5000
 yp = np.zeros(num_data_points)
-yp[0] = 1.0  # Initial condition
+#yp[0] = 1.0  # Initial condition
 
 u = np.sin(2 * np.pi * np.arange(num_data_points) / 250)
 
@@ -52,7 +52,7 @@ class SimpleNN:
         return self.mean_squared_error(y, o)
 
 
-def train_network(nn, X, Y, epochs=50, learning_rate=0.001):
+def train_network(nn, X, Y, epochs=50, learning_rate=0.01):
     losses = []
     for epoch in tqdm(range(epochs)):
         loss = 0
@@ -67,8 +67,8 @@ X = np.array([yp[:-1], yp[1:], u[:-1]]).T
 Y = yp[2:].reshape(-1, 1)
 
 # Initialize and train the network
-nn = SimpleNN(input_size=3, hidden_size=10, output_size=1)
-losses = np.array(train_network(nn, X, Y, epochs=100, learning_rate=0.005))
+nn = SimpleNN(input_size=3, hidden_size=20, output_size=1)
+losses = np.array(train_network(nn, X, Y, epochs=100, learning_rate=0.01))
 print(losses[-1])
 #Plot the loss over time
 import matplotlib.pyplot as plt
@@ -86,8 +86,9 @@ actual = []
 
 
 
-# Generate sinusoidal test data
-test_data = np.sin(2 * np.pi * np.arange(1000) / 250)
+# Generate test data
+test_data = np.random.uniform(-1, 1, 5000)
+test_data.sort()
 yp_test = np.zeros(len(test_data) + 2)  # Include initial conditions
 
 # The test should start where the plant has some initial dynamic behavior
@@ -126,28 +127,18 @@ plt.close()
 num_data_points = 5000
 yp = np.zeros(num_data_points)
 
-u = np.sin(2 * np.pi * np.arange(num_data_points) / 250) + np.sin(2 * np.pi * np.arange(num_data_points) / 25)
+u = np.random.uniform(-1, 1, 5000)
 
 for k in range(2, num_data_points):
     yp[k] = plant_equation(yp[k-1], yp[k-2], u[k-1])
 
-def train_network(nn, X, Y, epochs=50, learning_rate=0.001):
-    losses = []
-    for epoch in tqdm(range(epochs)):
-        loss = 0
-        for i in range(len(X)-1):
-            o = nn.forward(X[i:i+1])  # Use slicing to keep dimensions
-            loss +=nn.backward(X[i:i+1], Y[i], o, learning_rate)
-        mean_loss = loss / (len(X)-1)
-        losses.append(mean_loss)
-    return losses
 # Prepare the data for training
 X = np.array([yp[:-1], yp[1:], u[:-1]]).T
 Y = yp[2:].reshape(-1, 1)
 
 # Initialize and train the network
-nn = SimpleNN(input_size=3, hidden_size=10, output_size=1)
-losses = np.array(train_network(nn, X, Y, epochs=1000, learning_rate=0.005))
+#nn = SimpleNN(input_size=3, hidden_size=10, output_size=1)
+losses = np.array(train_network(nn, X, Y, epochs=1000, learning_rate=0.0005))
 print(losses[-1])
 #Plot the loss over time
 import matplotlib.pyplot as plt
@@ -165,7 +156,7 @@ actual = []
 
 
 # Generate sinusoidal test data
-test_data = np.sin(2 * np.pi * np.arange(1000) / 250) + np.sin(2 * np.pi * np.arange(1000) / 25)
+test_data = np.sin(2 * np.pi * np.arange(100) / 250) + np.sin(2 * np.pi * np.arange(100) / 25)
 yp_test = np.zeros(len(test_data) + 2)  # Include initial conditions
 
 # The test should start where the plant has some initial dynamic behavior
