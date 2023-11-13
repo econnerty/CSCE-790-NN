@@ -12,6 +12,7 @@ def plant_equation(yp_k, yp_k_minus_1, u_k):
 # Generate data
 num_data_points = 5000
 yp = np.zeros(num_data_points)
+yp[0] = 1.0  # Initial condition
 
 u = np.sin(2 * np.pi * np.arange(num_data_points) / 250)
 
