@@ -117,19 +117,19 @@ plt.plot(actual_f, label='Actual Nf')
 plt.plot(test_output_f, label='Predicted Nf')
 plt.legend()
 plt.title('Predicted Outputs for Nf')
-plt.show()
+plt.savefig('ex3_nf_predictedvs_actual.pdf')
 
 plt.plot(actual_g, label='Actual Ng')
 plt.plot(test_output_g, label='Predicted Ng')
 plt.legend()
 plt.title('Predicted Outputs for Ng')
-plt.show()
+plt.savefig('ex3_ng_predictedvs_actual.pdf')
 
 plt.plot(actual_plant, label='Actual Plant')
 plt.plot(predicted_plant, label='Predicted plant')
 plt.legend()
 plt.title('Predicted Outputs and Actual plant Values')
-plt.show()
+plt.savefig('ex3_predictedvs_actual.pdf')
 
 
 

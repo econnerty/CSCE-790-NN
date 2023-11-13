@@ -114,7 +114,7 @@ plt.plot(predicted, label='predicted')
 plt.plot(actual, label='actual')
 plt.title('Predicted vs actual Plant Output')
 plt.legend()
-plt.show()
+plt.savefig('ex1_predictedvs_actual.pdf')
 
 # Generate sum of sinusoidal data
 
@@ -191,7 +191,7 @@ plt.plot(predicted, label='predicted')
 plt.plot(actual, label='actual')
 plt.title('Predicted vs actual Plant Output with Sum of Sinusoids')
 plt.legend()
-plt.show()
+plt.savefig('ex1_sum_of_sinusoids.pdf')
 
 
 
