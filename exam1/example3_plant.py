@@ -18,8 +18,7 @@ def plant_equation(yp_k, u_k):
 
 # Generate random input data for u(k) in the interval [-2, 2]
 num_data_points = 5000
-u = np.sin(2 * np.pi * np.arange(num_data_points) / 25) + np.sin(2 * np.pi * np.arange(num_data_points) / 10)
-
+u = np.random.uniform(-2, 2, num_data_points)
 # Initialize the output array for y_p(k)
 yp = np.zeros(num_data_points)
 
@@ -99,7 +98,7 @@ plt.show()"""
 
 
 # Generate new test data for u(k)
-test_data_u = np.random.uniform(-1, 1, 50)
+test_data_u = np.random.uniform(-2, 2, 50)
 
 # Generate the test outputs for N_f and N_g
 test_output_f = np.array([nn_f.forward(np.array([[y]])) for y in test_data_u]).flatten()
@@ -118,18 +117,21 @@ plt.plot(test_output_f, label='Predicted Nf')
 plt.legend()
 plt.title('Predicted Outputs for Nf')
 plt.savefig('ex3_nf_predictedvs_actual.pdf')
+plt.close()
 
-plt.plot(actual_g, label='Actual Ng')
+plt.plot(actual_g,label='Actual Ng')
 plt.plot(test_output_g, label='Predicted Ng')
 plt.legend()
 plt.title('Predicted Outputs for Ng')
 plt.savefig('ex3_ng_predictedvs_actual.pdf')
+plt.close()
 
 plt.plot(actual_plant, label='Actual Plant')
 plt.plot(predicted_plant, label='Predicted plant')
 plt.legend()
 plt.title('Predicted Outputs and Actual plant Values')
 plt.savefig('ex3_predictedvs_actual.pdf')
+plt.close()
 
 
 
